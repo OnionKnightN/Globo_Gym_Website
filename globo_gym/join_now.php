@@ -1,22 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <title>Join Now</title>
-    <meta name="viewport" content="width=device-width, intial-scale=1.0">
-    <link rel="stylesheet" href="css/style.css">
-    <style>
-      .error {
-        font-family: Helvetica;
-        color: #800000;
-        margin-top: -5px;
-      }
-    </style>
-  </head>
-  <body>
     <?php
+    include_once("header.php");
+    // Validate for logged in users → forbidden access.
+    if(isset($_SESSION["user_email"]) && isset($_SESSION["user_id"]) && isset($_SESSION["user_type"])){
+      header("Location: index.php?error=forbidden");
+    }
+    // Start off the page with some URL validation
+
+    // Declare some global variables
     // Error Messages of Forms
     $user_typeErr = "";
+    $user_tier = "";
+    $user_classes[] = "";
     $user_titleErr = "";
     $user_fnameErr = "";
     $user_lnameErr = "";
@@ -30,8 +24,8 @@
     $user_healthErr = "";
     $user_termsErr = "";
     // Input of information of Forms
-    $user_id = 20000;
-    $user_type = "";
+    $user_type = "Member";
+    $user_tier = "";
     $user_title = "";
     $user_fname = "";
     $user_lname = "";
@@ -48,24 +42,33 @@
     $user_terms = "";
     // Number of errors from form
     $errors = 0;
-    // Form vailidation.
+    
+    // Catch URL requests
+    // Form validation.
     if ($_SERVER['REQUEST_METHOD'] == "POST") {
-      // Membership vailidation.
-      $user_id += 1;
+      // Membership validation.
       if (empty($_POST["user_type"])) {
         $user_typeErr = "<p class ='error'>*Please select a Membership Type</p>";
         $errors += 1;
       } else {
-        $user_type = test_input($_POST["user_type"]);
+        $user_tier = test_input($_POST["user_type"]);
       }
-      // Title vailidation.
+      // Classes validation.
+      if (empty($_POST["class"])) {
+        $user_typeErr = "<p class ='error'>*Please select at least one class/p>";
+        $errors += 1;
+      } else {
+        $user_classes = $_POST["class"];
+      }
+
+      // Title validation.
       if (empty($_POST["user_title"])) {
         $user_titleErr = "<p class ='error'>*Please select a Title</p>";
         $errors += 1;
       } else {
         $user_title  = test_input($_POST["user_title"]);
       }
-      // First Name vailidation.
+      // First Name validation.
       if (empty($_POST["user_fname"])) {
         $user_fnameErr = "<p class ='error'>*First name is required.</p>";
         $errors += 1;
@@ -76,7 +79,7 @@
           $errors += 1;
         }
       }
-      // Last Name vailidation.
+      // Last Name validation.
       if (empty($_POST["user_lname"])) {
         $user_lnameErr = "<p class ='error'>*Last name is required.</p>";
         $errors += 1;
@@ -87,14 +90,14 @@
           $errors += 1;
         }
       }
-      // Gender vailidation.
+      // Gender validation.
       if (empty($_POST["user_gender"])) {
         $user_genderErr = "<p class ='error'>*Please select a gender type</p>";
         $errors += 1;
       } else {
         $user_gender = test_input($_POST["user_gender"]);
       }
-      // Date of Birth vailidation.
+      // Date of Birth validation.
       if (empty($_POST["user_dob"])) {
         $user_dobErr = "<p class ='error'>*Date of birth is required.</p>";
         $errors += 1;
@@ -124,9 +127,9 @@
         $user_pass1Err = "<p class ='error'>*The passwords do not match.</p>";
       } else {
         $user_pass1 = test_input($_POST['user_pass1']);
-        $user_pass1 = hash('sha256', $user_pass1);
+        $user_pass1 = password_hash($user_pass1, PASSWORD_DEFAULT);
       }
-      // Phone vailidation.
+      // Phone validation.
       if (empty($_POST["user_phone"])) {
         $user_phoneErr = "<p class ='error'>*Phone number is required.</p>";
         $errors += 1;
@@ -137,7 +140,7 @@
           $errors += 1;
         }
       }
-      // Address vailidation.
+      // Address validation.
       if (empty($_POST["user_address"])) {
         $user_addressErr = "<p class ='error'>*Address is required.</p>";
         $errors += 1;
@@ -148,86 +151,154 @@
           $errors += 1;
         }
       }
-      // Post code vailidation.
+      // Post code validation.
       if (empty($_POST["user_pcode"])) {
         $user_pcodeErr = "<p class ='error'>*Please select post code</p>";
         $errors += 1;
       } else {
         $user_pcode = test_input($_POST["user_pcode"]);
       }
-      // User health vailidation
+      // User health validation
       if(empty($_POST['user_health'])){
           $user_healthErr = "<br><br><p class ='error'>*Please check one of the health options</p>";
           $errors += 1;
       } else {
           $user_health = "if you check yes for health issues please inform our gym receptionist.";
       }
-      // User terms vailidation
+      // User terms validation
       if(empty($_POST['user_terms'])){
           $user_termsErr = "<p class ='error'>*Please read and agreed to the Globo Gym's terms and condition before continuing.</p>";
           $errors += 1;
       } else {
           $user_terms = "You have read and agreed to the Globo Gym's terms and condition";
       }
+
+      if($errors == 0){
+        /* =====================================================================================
+        *  ======================================= SQL Insertion ===============================
+        *  ===================================================================================== */
+
+        // Prepare SQL Insertion
+        $query = "INSERT INTO tbl_user(user_type, user_title, user_fname, user_lname, user_gender, user_dob, user_email, user_address, user_pcode, user_phone)  VALUES('$user_type','$user_title','$user_fname','$user_lname','$user_gender','$user_dob','$user_email','$user_address','$user_pcode','$user_phone')";
+        // Query to get ID
+        $query_id = "SELECT user_id FROM tbl_user WHERE user_email = '$user_email' GROUP BY user_id DESC LIMIT 1";
+        // Assign global Variables
+        $class_list = "";
+        $now = date("Y-m-d");
+        $user_id = "";
+        
+        
+        //(mysqli_query($db_connection, $query);
+        if (mysqli_query($db_conn, $query)){
+                //  Test for valid User ID.
+                $pull_id = mysqli_query($db_conn, $query_id);
+                $num = mysqli_num_rows($pull_id);
+                // Test if the id query passed.
+                if($num>0){
+                  while($row = mysqli_fetch_array($pull_id)){
+                    // Assign value to id
+                    $user_id = $row["user_id"];
+                  }
+                }else{
+                  // Error
+                }
+                // Iterate through the class array.
+                foreach($user_classes as $selected){
+                  if ($class_list != ""){
+                    $class_list = $class_list.",";
+                  }
+                  $class_list = $class_list. "('$user_id', '$selected')";
+                }
+                $query_classes = "INSERT INTO tbl_userclass VALUES $class_list";
+                $query_pass = "INSERT INTO tbl_creds VALUES ('$user_id','$user_pass1')";
+                $query_tier = "INSERT INTO tbl_usertier VALUES ('$user_id','$user_tier','$now','1')";
+          if(mysqli_query($db_conn, $query_classes)){
+            if(mysqli_query($db_conn, $query_tier)){
+              if(mysqli_query($db_conn, $query_pass)){
+                echo "<p class = 'userdata'>Has Successfully Been Added to the Database!!</p>";
+              header("Location: index.php?registration=success");
+              }else{
+                echo "<p>Error Inserting Password</p>";
+              }
+            }else{
+              echo "<p>Error Inserting Tier</p>";
+            }
+          }else{
+            echo "<p>Error Inserting Classes</p>";
+          }
+        }else {
+          echo "<p class = 'userdata'> You are not connected to the database.</p>";
+        }
+      }
     }
-    //Manipulate the data input from the user.
+
+    // ===================================================================================
+
+    // Functions
+    //Sanitize the data input from the user.
     function test_input($data)
     {
       $data = trim($data);
       $data = stripslashes($data);
       $data = htmlspecialchars($data);
-      $data = strtolower($data);
+      $data = mysqli_real_escape_string($GLOBALS["db_conn"], $data);
       return $data;
     }
+
+
+    // Front End code below ====================================================================================================================================================
     if ($errors == 0) {?>
-    <header>
-      <div><a href="index.html"><img src="img/globoGymLogo.png" alt= "home logo" id ="logo"></a></div>
-      <label id= "burger" for="toggle">&#9776;</label>
-      <input type="checkbox" id="toggle"/>
-      <nav class="nav_main">
-        <ul class="nav_list">
-          <li><a href="membership.html">MEMBERSHIP</a></li>
-          <li><a href="classes.html">CLASSES</a></li>
-          <li><a href="about_us.html">ABOUT US</a></li>
-          <li><a href="testimonial.html">TESTIMONIAL</a></li>
-          <li><a href="careers.html">CAREERS</a></li>
-          <li><a href="contact_us.html">CONTACT US</a></li>
-          <li class = "special"><a href="join_now.html">JOIN NOW</a></li>
-          <li class = "special"><a href="login.html">LOG IN</a></li>
-        </ul>
-      </nav>
-    </header>
     <section class="form_container">
       <form action="join_now.php" method="post" class="form">
         <h1>GYM MEMBERSHIP</h1>
         <label>MEMBERSHIP TYPE*</label>
         <select name="user_type" class="form_control">
-          <option value="month_stu">Monthly Student</option>
-          <option value="year_stu">Yearly Student</option>
-          <option value="month_adt">Monthly Adult</option>
-          <option value="year_adt">Yearly Adult</option>
-          <option value="month_premium">Monthly Premium</option>
-          <option value="year_premium">Yearly Premium</option>
+          <?php
+            $pull_tier = "SELECT tier_id, tier_name FROM tbl_tier WHERE tier_stat = '1'";
+            $pull_tier_result = mysqli_query($db_conn, $pull_tier);
+            if($pull_tier_result){
+              $num = mysqli_num_rows($pull_tier_result);
+             //  Test for valid test result
+             if($num>0){
+               while($row =mysqli_fetch_array($pull_tier_result)){
+                 // Echo out the tiers
+                 echo '<option value="'.$row["tier_id"].'">'.$row["tier_name"].'</option>';
+               }
+             }else{
+               // Echo out if there are no tiers listed.
+               echo '<option>No tiers available</option>';
+             }
+            }
+          ?>
         </select>
-         <!--<label>CLASS*</label><br>
+         <label>CLASS*</label><br>
            <div class = "form_class_container" >
-            <input type="checkbox" name="bootcamp" value="bootcamp" class="form_class"><label>BOOTCAMP</label>
-            <input type="checkbox" name="strength/condition" value="strength/condition" class="form_class"><label>STRENGTH/CONDITION</label>
-            <input type="checkbox" name="battle_rope" value="battle_rope" class="form_class"><label>BATTLE ROPES</label>
-            <input type="checkbox" name="boxing" value="boxing" class="form_class"><label>BOXING</label>
-            <input type="checkbox" name="globocycle" value="globocycle" class="form_class"><label>GLOBO CYCLE</label>
-            <input type="checkbox" name="dragonboat" value="dragonboat" class="form_class"><label>DRAGON BOAT</label>
-            <input type="checkbox" name="trx" value="trx" class="form_class"><label>TRX</label>
-            <input type="checkbox" name="kickboxing" value="kickboxing" class="form_class"><label>KICKBOXING</label>
-            <input type="checkbox" name="globoball" value="globoball" class="form_class"><label>GLOBOBALL</label>
-          </div>-->
+             <?php 
+                // Pull all classes from database
+                $pull_class = "SELECT class_id, class_name FROM tbl_class WHERE class_stat = '1'";
+                $pull_class_result = mysqli_query($db_conn, $pull_class);
+                if($pull_class_result){
+                  $num = mysqli_num_rows($pull_class_result);
+                 //  Test for valid test result
+                 if($num>0){
+                   while($row = mysqli_fetch_array($pull_class_result)){
+                     // Echo out the classes
+                     echo '<input type="checkbox" name="class[]" value="'.$row["class_id"].'" class="form_class"><label>'.$row["class_name"].'</label>';
+                   }
+                 }else{
+                   // Echo out if there are no classes listed.
+                   echo '<input type="checkbox" name="class[]" value="" class="form_class"><label>No classes are currently available</label>';
+                 }
+                }
+             ?>
+          </div>
         <label>TITLE*</label>
         <select name="user_title" class="form_control">
-          <option value="mr">Mr</option>
-          <option value="mrs">Mrs</option>
-          <option value="ms">Ms</option>
-          <option value="mx">Mx</option>
-          <option value="dr">Dr</option>
+          <option value="Mr">Mr</option>
+          <option value="Mrs">Mrs</option>
+          <option value="Ms">Ms</option>
+          <option value="Mx">Mx</option>
+          <option value="Dr">Dr</option>
         </select>
         <label>FIRSTNAME*</label><input type="text" name="user_fname" class="form_control" size="20" maxlength="30">
         <label>LASTNAME*</label><input type="text" name="user_lname" class="form_control" size="20" maxlength="30">
@@ -243,7 +314,7 @@
         <label>CONFIRM EMAIL*</label>
         <input type="email" name="confirm_user_email" class="form_control"/>
         <label>PASSWORD*</label><input type="password" class="form_control" name="user_pass1" required>
-        <label>COMFIRM PASSWORD*</label><input type="password" class="form_control" name="user_pass2" required>
+        <label>CONFIRM PASSWORD*</label><input type="password" class="form_control" name="user_pass2" required>
         <label>ADDRESS</label> <input type="text" name="user_address" size="20" maxlength="200" class ="form_control">
         <label>POST CODE</label>
           <select name ="user_pcode" class ="form_control">
@@ -285,88 +356,55 @@
         <input type="submit" name="submit" value="SUBMIT" class="formBtn" required>
       </form>
     </section>
-    <footer>
-      <div class="footer_detail">
-        <h3>GLOBO GYM LIMITED</h3>
-        <p>10 Harring Angel Street,Dublin 8<br>Mobile No: 014967876<br>
-        Email: globogym@gmail.com<br><br>Registered in Ireland<br>
-        Company No . IE555527<br>VAT No. IE1123544OH</p>
-      </div>
-      <div class="footer_list">
-        <h3>QUICK LINKS</h3>
-        <ul>
-          <li><a href="#">ABOUT US</a></li>
-          <li><a href="#">CLASSES</a></li>
-          <li><a href="#">CAREERS</a></li>
-          <li><a href="#">CONTACT US</a></li>
-          <li><a href="#">PRIVACY POLICY</a></li>
-          <li><a href="#">TERMS & CONDITIONS</a></li>
-        </ul>
-      </div>
-      <div class="social">
-        <h3>SOCIAL MEDIA</h3>
-        <a href="#" target="_blank"><img src="img/facebook.png" alt= "facebook logo" class ="social_logo"></a>
-        <a href="#" target="_blank"><img src="img/instagram.png" alt= "instagram logo" class ="social_logo"></a>
-        <a href="#" target="_blank"><img src="img/youtube.png" alt= "youtube logo" class ="social_logo"></a>
-        <a href="#" target="_blank"><img src="img/snapchat.png" alt= "snapcaht logo" class ="social_logo"></a>
-      </div>
-    </footer>
-    <?php
-				$db_connection = mysqli_connect('localhost', 's2989969', 'Password', 's2989969');
-				mysqli_set_charset($db_connection, 'utf8');
-				$query = "INSERT INTO tbl_user VALUES('$user_id','$user_type','$user_title','$user_fname','$user_lname','$user_gender','$user_dob','$user_email','$user_address','$user_pcode','$user_phone')";
-        //(mysqli_query($db_connection, $query);
-        if (mysqli_query($db_connection, $query)){
-					echo "<p class = 'userdata'>Has Successfully Been Added to the Database!!</p>";
-				}else {
-					echo "<p class = 'userdata'> You are not connected to the database.</p>";
-				}
-				mysqli_close($db_connection);
-			?>
+    <?php include_once("footer.php"); ?>
+
     <?php
 		  }else { ?>
-        <header>
-          <div><a href="index.html"><img src="img/GloboGymLogo.png" alt= "home logo" id ="logo"></a></div>
-          <label id= "burger" for="toggle">&#9776;</label>
-          <input type="checkbox" id="toggle"/>
-          <nav class="nav_main">
-            <ul class="nav_list">
-              <li><a href="membership.html">MEMBERSHIP</a></li>
-              <li><a href="classes.html">CLASSES</a></li>
-              <li><a href="about_us.html">ABOUT US</a></li>
-              <li><a href="testimonial.html">TESTIMONIAL</a></li>
-              <li><a href="careers.html">CAREERS</a></li>
-              <li><a href="contact_us.html">CONTACT US</a></li>
-              <li class = "special"><a href="join_now.html">JOIN NOW</a></li>
-              <li class = "special"><a href="login.html">LOG IN</a></li>
-            </ul>
-          </nav>
-        </header>
         <section class="form_container">
           <form action="join_now.php" method="post" class="form">
             <h1>GYM MEMBERSHIP</h1>
             <label>MEMBERSHIP TYPE*</label>
             <select name="user_type" class="form_control">
-              <option value="month_stu">Monthly Student</option>
-              <option value="year_stu">Yearly Student</option>
-              <option value="month_adt">Monthly Adult</option>
-              <option value="year_adt">Yearly Adult</option>
-              <option value="month_premium">Monthly Premium</option>
-              <option value="year_premium">Yearly Premium</option>
+              <?php
+                $pull_tier = "SELECT tier_id, tier_name FROM tbl_tier WHERE tier_stat = '1'";
+                $pull_tier_result = mysqli_query($db_conn, $pull_tier);
+                if($pull_tier_result){
+                  $num = mysqli_num_rows($pull_tier_result);
+                //  Test for valid test result
+                if($num>0){
+                  while($row =mysqli_fetch_array($pull_tier_result)){
+                    // Echo out the classes
+                    echo '<option value="'.$row["tier_id"].'">'.$row["tier_name"].'</option>';
+                  }
+                }else{
+                  // Echo out if there are no classes listed.
+                  echo '<option>No tiers available</option>';
+                }
+                }
+              ?>
             </select>
             <?php echo $user_typeErr; ?>
-             <!--<label>CLASS*</label><br>
-               <div class = "form_class_container" >
-                <input type="checkbox" name="bootcamp" value="bootcamp" class="form_class"><label>BOOTCAMP</label>
-                <input type="checkbox" name="strength/condition" value="strength/condition" class="form_class"><label>STRENGTH/CONDITION</label>
-                <input type="checkbox" name="battle_rope" value="battle_rope" class="form_class"><label>BATTLE ROPES</label>
-                <input type="checkbox" name="boxing" value="boxing" class="form_class"><label>BOXING</label>
-                <input type="checkbox" name="globocycle" value="globocycle" class="form_class"><label>GLOBO CYCLE</label>
-                <input type="checkbox" name="dragonboat" value="dragonboat" class="form_class"><label>DRAGON BOAT</label>
-                <input type="checkbox" name="trx" value="trx" class="form_class"><label>TRX</label>
-                <input type="checkbox" name="kickboxing" value="kickboxing" class="form_class"><label>KICKBOXING</label>
-                <input type="checkbox" name="globoball" value="globoball" class="form_class"><label>GLOBOBALL</label>
-              </div>-->
+            <label>CLASS*</label><br>
+           <div class = "form_class_container" >
+             <?php 
+                // Pull all classes from database
+                $pull_class = "SELECT class_id, class_name FROM tbl_class WHERE class_stat = '1'";
+                $pull_class_result = mysqli_query($db_conn, $pull_class);
+                if($pull_class_result){
+                  $num = mysqli_num_rows($pull_class_result);
+                 //  Test for valid test result
+                 if($num>0){
+                   while($row =mysqli_fetch_array($pull_class_result)){
+                     // Echo out the classes
+                     echo '<input type="checkbox" name="class[]" value="'.$row["class_id"].'" class="form_class"><label>'.$row["class_name"].'</label>';
+                   }
+                 }else{
+                   // Echo out if there are no classes listed.
+                   echo '<input type="checkbox" name="class[]" value="" class="form_class"><label>No classes are currently available</label>';
+                 }
+                }
+             ?>
+          </div>
             <label>TITLE*</label>
             <select name="user_title" class="form_control">
               <option value="mr">Mr</option>
@@ -442,62 +480,6 @@
             <input type="submit" name="submit" value="SUBMIT" class="formBtn" required>
           </form>
         </section>
-        <footer>
-          <div class="footer_detail">
-            <h3>GLOBO GYM LIMITED</h3>
-            <p>10 Harring Angel Street,Dublin 8<br>Mobile No: 014967876<br>
-            Email: globogym@gmail.com<br><br>Registered in Ireland<br>
-            Company No . IE555527<br>VAT No. IE1123544OH</p>
-          </div>
-          <div class="footer_list">
-            <h3>QUICK LINKS</h3>
-            <ul>
-              <li><a href="#">ABOUT US</a></li>
-              <li><a href="#">CLASSES</a></li>
-              <li><a href="#">CAREERS</a></li>
-              <li><a href="#">CONTACT US</a></li>
-              <li><a href="#">PRIVACY POLICY</a></li>
-              <li><a href="#">TERMS & CONDITIONS</a></li>
-            </ul>
-          </div>
-          <div class="social">
-            <h3>SOCIAL MEDIA</h3>
-            <a href="#" target="_blank"><img src="img/facebook.png" alt= "facebook logo" class ="social_logo"></a>
-            <a href="#" target="_blank"><img src="img/instagram.png" alt= "instagram logo" class ="social_logo"></a>
-            <a href="#" target="_blank"><img src="img/youtube.png" alt= "youtube logo" class ="social_logo"></a>
-            <a href="#" target="_blank"><img src="img/snapchat.png" alt= "snapcaht logo" class ="social_logo"></a>
-          </div>
-        </footer>
-    <?php }?>
-    <?php
-      echo "<h2>Your Input:</h2>";
-      echo $user_id;
-      echo "<br>";
-      echo $user_type;
-      echo "<br>";
-      echo $user_title;
-      echo "<br>";
-      echo $user_fname;
-      echo "<br>";
-      echo $user_lname;
-      echo "<br>";
-      echo $user_gender;
-      echo "<br>";
-      echo $user_dob;
-      echo "<br>";
-      echo $user_email;
-      echo "<br>";
-      echo $user_pass1;
-      echo "<br>";
-      echo $user_phone;
-      echo "<br>";
-      echo $user_address;
-      echo "<br>";
-      echo $user_pcode;
-      echo "<br>";
-      echo $user_health;
-      echo "<br>";
-      echo $user_terms;
-    ?>
+    <?php include_once("footer.php"); }?>
   </body>
 </html>
