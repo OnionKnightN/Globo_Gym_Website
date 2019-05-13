@@ -14,7 +14,7 @@
   </head>
   <body>
     <header>
-      <div><a href="index.php"><img src="img/GloboGymLogo.png" alt= "home logo" id ="logo"></a></div>
+      <div><a href="index.php"><img src="img/globoGymLogo.png" alt= "home logo" id ="logo"></a></div>
       <label id= "burger" for="toggle">&#9776;</label>
       <input type="checkbox" id="toggle"/>
       <nav class="nav_main">
