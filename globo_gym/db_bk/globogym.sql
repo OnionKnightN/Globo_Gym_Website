@@ -8,7 +8,7 @@ DROP TABLE IF EXISTS tbl_featured;
 CREATE TABLE tbl_featured (
   featured_id INT(8) NOT NULL AUTO_INCREMENT,
   featured_title VARCHAR(50) DEFAULT NULL,
-  featured_desc VARCHAR(300) DEFAULT NULL,
+  featured_desc VARCHAR(500) DEFAULT NULL,
   featured_link VARCHAR(255) DEFAULT NULL,
   featured_image VARCHAR(255) DEFAULT NULL,
   featured_stat INT(1) DEFAULT NULL,
@@ -20,6 +20,112 @@ AVG_ROW_LENGTH = 8192
 CHARACTER SET latin1
 COLLATE latin1_swedish_ci;
 
+--
+-- Definition for table tbl_user
+--
+DROP TABLE IF EXISTS tbl_user;
+CREATE TABLE tbl_user (
+  user_id INT(8) NOT NULL AUTO_INCREMENT,
+  user_title VARCHAR(3) DEFAULT NULL,
+  user_fname VARCHAR(50) DEFAULT NULL,
+  user_lname VARCHAR(50) DEFAULT NULL,
+  user_type VARCHAR(20) DEFAULT NULL,
+  user_pcode VARCHAR(10) DEFAULT NULL,
+  user_address VARCHAR(100) DEFAULT NULL,
+  user_email VARCHAR(100) DEFAULT NULL,
+  user_phone VARCHAR(10) DEFAULT NULL,
+  user_gender INT(1) DEFAULT NULL,
+  user_dob DATE DEFAULT NULL,
+  PRIMARY KEY (user_id)
+)
+ENGINE = INNODB
+AUTO_INCREMENT = 13
+AVG_ROW_LENGTH = 4096
+CHARACTER SET latin1
+COLLATE latin1_swedish_ci;
+
+
+--
+-- Definition for table tbl_class
+--
+DROP TABLE IF EXISTS tbl_class;
+CREATE TABLE tbl_class (
+  class_id INT(8) NOT NULL AUTO_INCREMENT,
+  class_name VARCHAR(50) DEFAULT NULL,
+  class_desc VARCHAR(255) DEFAULT NULL,
+  class_capacity INT(3) DEFAULT NULL,
+  class_image VARCHAR(500) DEFAULT NULL,
+  class_day VARCHAR(3) DEFAULT NULL,
+  class_stime TIME DEFAULT NULL,
+  class_etime TIME DEFAULT NULL,
+  class_tier INT(1) DEFAULT NULL,
+  class_stat INT(1) DEFAULT NULL,
+  PRIMARY KEY (class_id)
+)
+ENGINE = INNODB
+AUTO_INCREMENT = 13
+AVG_ROW_LENGTH = 1489
+CHARACTER SET latin1
+COLLATE latin1_swedish_ci;
+
+--
+-- Definition for table tbl_tier
+--
+DROP TABLE IF EXISTS tbl_tier;
+CREATE TABLE tbl_tier (
+  tier_id INT(8) NOT NULL AUTO_INCREMENT,
+  tier_name VARCHAR(30) DEFAULT NULL,
+  tier_details VARCHAR(500) DEFAULT NULL,
+  tier_price INT(11) DEFAULT NULL,
+  tier_class_limit INT(10) DEFAULT NULL,
+  tier_image VARCHAR(255) DEFAULT NULL,
+  tier_stat INT(1) DEFAULT NULL,
+  PRIMARY KEY (tier_id)
+)
+ENGINE = INNODB
+AUTO_INCREMENT = 8
+AVG_ROW_LENGTH = 2730
+CHARACTER SET latin1
+COLLATE latin1_swedish_ci;
+
+
+--
+-- Definition for table tbl_testimonial
+--
+DROP TABLE IF EXISTS tbl_testimonial;
+CREATE TABLE tbl_testimonial (
+  test_id INT(8) NOT NULL AUTO_INCREMENT,
+  test_title VARCHAR(80) DEFAULT NULL,
+  test_content VARCHAR(250) DEFAULT NULL,
+  test_stars INT(1) DEFAULT NULL,
+  test_stat INT(1) DEFAULT NULL,
+  PRIMARY KEY (test_id)
+)
+ENGINE = INNODB
+AUTO_INCREMENT = 14
+AVG_ROW_LENGTH = 16384
+CHARACTER SET latin1
+COLLATE latin1_swedish_ci;
+
+--
+-- Definition for table tbl_mail
+--
+DROP TABLE IF EXISTS tbl_mail;
+CREATE TABLE tbl_mail (
+  mail_id INT(8) NOT NULL AUTO_INCREMENT,
+  mail_type VARCHAR(20) DEFAULT NULL,
+  mail_subj VARCHAR(80) DEFAULT NULL,
+  mail_content VARCHAR(500) DEFAULT NULL,
+  mail_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  mail_attachment VARCHAR(255) DEFAULT NULL,
+  mail_stat INT(1) DEFAULT NULL,
+  PRIMARY KEY (mail_id)
+)
+ENGINE = INNODB
+AUTO_INCREMENT = 4
+AVG_ROW_LENGTH = 16384
+CHARACTER SET latin1
+COLLATE latin1_swedish_ci;
 
 --
 -- Definition for table tbl_classtest
@@ -78,53 +184,6 @@ CHARACTER SET latin1
 COLLATE latin1_swedish_ci;
 
 
-
---
--- Definition for table tbl_tier
---
-DROP TABLE IF EXISTS tbl_tier;
-CREATE TABLE tbl_tier (
-  tier_id INT(8) NOT NULL AUTO_INCREMENT,
-  tier_name VARCHAR(30) DEFAULT NULL,
-  tier_details VARCHAR(500) DEFAULT NULL,
-  tier_price INT(11) DEFAULT NULL,
-  tier_class_limit INT(10) DEFAULT NULL,
-  tier_image VARCHAR(255) DEFAULT NULL,
-  tier_stat INT(1) DEFAULT NULL,
-  PRIMARY KEY (tier_id)
-)
-ENGINE = INNODB
-AUTO_INCREMENT = 8
-AVG_ROW_LENGTH = 2730
-CHARACTER SET latin1
-COLLATE latin1_swedish_ci;
-
---
--- Definition for table tbl_user
---
-DROP TABLE IF EXISTS tbl_user;
-CREATE TABLE tbl_user (
-  user_id INT(8) NOT NULL AUTO_INCREMENT,
-  user_title VARCHAR(3) DEFAULT NULL,
-  user_fname VARCHAR(50) DEFAULT NULL,
-  user_lname VARCHAR(50) DEFAULT NULL,
-  user_type VARCHAR(20) DEFAULT NULL,
-  user_pcode VARCHAR(10) DEFAULT NULL,
-  user_address VARCHAR(100) DEFAULT NULL,
-  user_email VARCHAR(100) DEFAULT NULL,
-  user_phone INT(10) DEFAULT NULL,
-  user_gender INT(1) DEFAULT NULL,
-  user_dob DATE DEFAULT NULL,
-  PRIMARY KEY (user_id)
-)
-ENGINE = INNODB
-AUTO_INCREMENT = 13
-AVG_ROW_LENGTH = 4096
-CHARACTER SET latin1
-COLLATE latin1_swedish_ci;
-
-
-
 --
 -- Definition for table tbl_userclass
 --
@@ -179,30 +238,6 @@ AVG_ROW_LENGTH = 8192
 CHARACTER SET latin1
 COLLATE latin1_swedish_ci;
 
---
--- Definition for table tbl_class
---
-DROP TABLE IF EXISTS tbl_class;
-CREATE TABLE tbl_class (
-  class_id INT(8) NOT NULL AUTO_INCREMENT,
-  class_name VARCHAR(50) DEFAULT NULL,
-  class_desc VARCHAR(255) DEFAULT NULL,
-  class_capacity INT(3) DEFAULT NULL,
-  class_image VARCHAR(500) DEFAULT NULL,
-  class_day VARCHAR(3) DEFAULT NULL,
-  class_stime TIME DEFAULT NULL,
-  class_etime TIME DEFAULT NULL,
-  class_tier INT(1) DEFAULT NULL,
-  class_stat INT(1) DEFAULT NULL,
-  PRIMARY KEY (class_id)
-)
-ENGINE = INNODB
-AUTO_INCREMENT = 13
-AVG_ROW_LENGTH = 1489
-CHARACTER SET latin1
-COLLATE latin1_swedish_ci;
-
-
 
 --
 -- Definition for table tbl_usertier
@@ -225,45 +260,6 @@ AVG_ROW_LENGTH = 5461
 CHARACTER SET latin1
 COLLATE latin1_swedish_ci;
 
-
-
---
--- Definition for table tbl_testimonial
---
-DROP TABLE IF EXISTS tbl_testimonial;
-CREATE TABLE tbl_testimonial (
-  test_id INT(8) NOT NULL AUTO_INCREMENT,
-  test_title VARCHAR(80) DEFAULT NULL,
-  test_content VARCHAR(250) DEFAULT NULL,
-  test_stars INT(1) DEFAULT NULL,
-  test_stat INT(1) DEFAULT NULL,
-  PRIMARY KEY (test_id)
-)
-ENGINE = INNODB
-AUTO_INCREMENT = 14
-AVG_ROW_LENGTH = 16384
-CHARACTER SET latin1
-COLLATE latin1_swedish_ci;
-
---
--- Definition for table tbl_mail
---
-DROP TABLE IF EXISTS tbl_mail;
-CREATE TABLE tbl_mail (
-  mail_id INT(8) NOT NULL AUTO_INCREMENT,
-  mail_type VARCHAR(20) DEFAULT NULL,
-  mail_subj VARCHAR(80) DEFAULT NULL,
-  mail_content VARCHAR(500) DEFAULT NULL,
-  mail_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  mail_attachment VARCHAR(255) DEFAULT NULL,
-  mail_stat INT(1) DEFAULT NULL,
-  PRIMARY KEY (mail_id)
-)
-ENGINE = INNODB
-AUTO_INCREMENT = 4
-AVG_ROW_LENGTH = 16384
-CHARACTER SET latin1
-COLLATE latin1_swedish_ci;
 
 
 
@@ -307,7 +303,7 @@ INSERT INTO tbl_testimonial VALUES
 -- Dumping data for table tbl_tier
 --
 INSERT INTO tbl_tier VALUES
-(1, 'STUDENT MEMBERSHIP MONTHLY', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur eu venenatis purus. Nunc tristique ut erat sit amet luctus. Mauris sed odio congue, molestie eros vel, congue mi. Sed id quam id dolor facilisis laoreet at sed ligula. Etiam malesuada justo risus, at rutrum risus ullamcorper quis. Nam sed tempus elit, quis dapibus nulla. Aenean a nunc at risus consequat suscipit.', 29, 8000, '../img/tiers/premium.jpg', 1),
+(1, 'STUDENT MEMBERSHIP MONTHLY', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur eu venenatis purus. Nunc tristique ut erat sit amet luctus. Mauris sed odio congue, molestie eros vel, congue mi. Sed id quam id dolor facilisis laoreet at sed ligula. Etiam malesuada justo risus, at rutrum risus ullamcorper quis. Nam sed tempus elit, quis dapibus nulla. Aenean a nunc at risus consequat suscipit.', 29, 8000, NULL, 1),
 (2, 'STUDENT MEMBERSHIP YEARLY', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur eu venenatis purus.\r\n  Nunc tristique ut erat sit amet luctus. Mauris sed odio congue, molestie eros vel, congue mi. Sed id quam id dolor facilisis\r\n  laoreet at sed ligula. Etiam malesuada justo risus, at rutrum risus ullamcorper quis. Nam sed tempus elit, quis dapibus nulla.\r\n  Aenean a nunc at risus consequat suscipit.', 259, 8000, NULL, 1),
 (3, 'ADULT MEMBERSHIP MONTHLY', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur eu venenatis purus.\r\n  Nunc tristique ut erat sit amet luctus. Mauris sed odio congue, molestie eros vel, congue mi. Sed id quam id dolor facilisis\r\n  laoreet at sed ligula. Etiam malesuada justo risus, at rutrum risus ullamcorper quis. Nam sed tempus elit, quis dapibus nulla.\r\n  Aenean a nunc at risus consequat suscipit.', 39, 8000, NULL, 1),
 (4, 'ADULT MEMBERSHIP YEARLY', 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur eu venenatis purus.\r\n  Nunc tristique ut erat sit amet luctus. Mauris sed odio congue, molestie eros vel, congue mi. Sed id quam id dolor facilisis\r\n  laoreet at sed ligula. Etiam malesuada justo risus, at rutrum risus ullamcorper quis. Nam sed tempus elit, quis dapibus nulla.\r\n  Aenean a nunc at risus consequat suscipit.', 359, 8000, NULL, 1),
