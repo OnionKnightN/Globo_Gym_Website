@@ -65,7 +65,7 @@
             <h1>MEMBER LOGIN</h1>
             <label for="email"><b>Email:</b></label><input type="email" name="email" id = "email"/>
             <label><b>Password:</b></label><input type="password" name="psw" required><br>
-            <input type="submit" name="submit" value="Login" hidden>
+            <input type="submit" name="submit" value="Login">
           </form>
       </div>
     </section>
