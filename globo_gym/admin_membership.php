@@ -44,7 +44,7 @@ include_once("session_validate.php");
     }
     if ($errors == 0) {?>
     <section class="form_container" id = "membership_section">
-      <form action="membership_edit.php" method="post" class="form">
+      <form action="admin_membership.php" method="post" class="form">
         <h1>MEMBERSHIP UPDATE</h1>
         <label>MEMBERSHIP TYPE</label>
         <select name="tier_name" class="form_control">
@@ -84,7 +84,7 @@ include_once("session_validate.php");
     <?php
 		  }else { ?>
         <section class="form_container" id = "membership_section">
-          <form action="membership_edit.php" method="post" class="form">
+          <form action="admin_membership.php" method="post" class="form">
             <h1>GLOBO CLASS UPDATE</h1>
             <label>CLASS NAME</label>
             <select name="tier_name" class="form_control">
