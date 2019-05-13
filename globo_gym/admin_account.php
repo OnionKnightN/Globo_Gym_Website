@@ -231,7 +231,7 @@
     // Front End code below ====================================================================================================================================================
     if ($errors == 0) {?>
     <section class="form_container">
-      <form action="registration_edit.php" method="post" class="form">
+      <form action="admin_account.php" method="post" class="form">
         <h1>USER REGISTRATION UPDATE</h1>
         <label>ID*</label><input type="number" name="user_id" class="form_control" max = "99999999">
         <label>FIRSTNAME*</label><input type="text" name="user_fname" class="form_control" size="20" maxlength="30">
@@ -325,7 +325,7 @@
     </section>
     <?php }else { ?>
         <section class="form_container">
-          <form action="registration_edit.php" method="post" class="form">
+          <form action="admin_account.php" method="post" class="form">
           <label>ID*</label><input type="number" name="user_id" class="form_control" max = "99999999">
             <?php echo $user_idErr;?>
             <label>FIRSTNAME*</label><input type="text" name="user_fname" class="form_control" size="20" maxlength="30">
